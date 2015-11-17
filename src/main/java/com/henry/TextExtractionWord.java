@@ -1,17 +1,15 @@
 package com.henry;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -24,7 +22,6 @@ public class TextExtractionWord {
 
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private HttpClient client = new DefaultHttpClient();
     private static final String specialChar = "，。；";
     public static void main(String[] args) {
         String text = "";
@@ -35,7 +32,7 @@ public class TextExtractionWord {
         TextExtractionWord textExtraction = new TextExtractionWord();
 
 //        text = textExtraction.filterText(text);
-        text = textExtraction.readText("/Users/henry/Downloads", "poi_name");
+        text = textExtraction.readText("/Users/henry/Downloads", "poi_name_1117");
         int textLength = text.length();
 //        System.out.println(text);
         Map<String,Candidate> candidatesMap = textExtraction.getCandidate(wordMaxLength, text);
@@ -47,9 +44,6 @@ public class TextExtractionWord {
                 continue;
             }
 
-            if (keyword.equals("将太无二")){
-                System.out.println("####");
-            }
             Candidate candidate = candidatesMap.get(keyword);
             AtomicInteger frequency = candidate.getFrequence();
             if (frequency.intValue() < frequencyThreshold){
@@ -76,10 +70,20 @@ public class TextExtractionWord {
         }
 
 
+        IKAnalyzerService service = new IKAnalyzerService();
         for (String key : filteredKeywordList) {
-            List<String> tokens = textExtraction.getTokens(key, "text_ik");
+            List<String> tokens = service.analyzer(key);
             if (tokens.size()!=1){
-                System.out.println(key+":"+tokens);
+                if (tokens.size()==2){
+                    String kk = tokens.get(0)+tokens.get(1);
+                    if (!kk.equals(key)){
+                        System.out.println(key+":"+tokens);
+                    }
+
+                }else {
+                    System.out.println(key+":"+tokens);
+                }
+
             }
 
         }
@@ -275,33 +279,33 @@ public class TextExtractionWord {
 
 
 
-    public List<String> getTokens(String query,String segName){
-
-        String solrServerUrl = "http://localhost:8983/solr/";
-        List<String> tokens = new ArrayList<String>();
-        if (query==null || query.trim().equals("")){
-            return tokens;
-        }
-        try {
-
-            String queryEncode = URLEncoder.encode(query, "UTF8");
-
-            String url = solrServerUrl+"foodSpu/analysis/field?q="+queryEncode+"&analysis.fieldtype="+segName+"&wt=json";
-            HttpGet request = new HttpGet(url);
-            HttpResponse response = client.execute(request);
-
-            JsonNode node = OBJECT_MAPPER.readTree(EntityUtils.toString(response.getEntity()));
-            JsonNode node2 = node.get("analysis").get("field_types").get(segName);
-            JsonNode node3 = node2.get("query");
-            Iterator<JsonNode> iter = node3.get(5).iterator();
-            while (iter.hasNext()){
-                String token = iter.next().get("text").getTextValue();
-                tokens.add(token);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return tokens;
-    }
+//    public List<String> getTokens(String query,String segName){
+//
+//        String solrServerUrl = "http://localhost:8983/solr/";
+//        List<String> tokens = new ArrayList<String>();
+//        if (query==null || query.trim().equals("")){
+//            return tokens;
+//        }
+//        try {
+//
+//            String queryEncode = URLEncoder.encode(query, "UTF8");
+//
+//            String url = solrServerUrl+"foodSpu/analysis/field?q="+queryEncode+"&analysis.fieldtype="+segName+"&wt=json";
+//            HttpGet request = new HttpGet(url);
+//            HttpResponse response = client.execute(request);
+//
+//            JsonNode node = OBJECT_MAPPER.readTree(EntityUtils.toString(response.getEntity()));
+//            JsonNode node2 = node.get("analysis").get("field_types").get(segName);
+//            JsonNode node3 = node2.get("query");
+//            Iterator<JsonNode> iter = node3.get(5).iterator();
+//            while (iter.hasNext()){
+//                String token = iter.next().get("text").getTextValue();
+//                tokens.add(token);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return tokens;
+//    }
 }

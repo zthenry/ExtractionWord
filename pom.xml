@@ -24,6 +24,19 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.13</version>
     </dependency>
+    <dependency>
+      <groupId>org.wltea</groupId>
+      <artifactId>IKAnalyzer</artifactId>
+      <version>2012_u6</version>
+      <scope>system</scope>
+      <systemPath>/Users/henry/work/mylib/IKAnalyzer2012FF_u1.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>4.10.0</version>
+    </dependency>
 
   </dependencies>
 </project>
