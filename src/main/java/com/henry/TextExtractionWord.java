@@ -1,7 +1,5 @@
 package com.henry;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
@@ -61,7 +59,7 @@ public class TextExtractionWord {
              */
             double combinationDegree = textExtraction.computeCombinationDegree(candidate);
 
-            if (combinationDegree<2 || agglomerationDegree< 1000){
+            if (combinationDegree<2 || agglomerationDegree< 100){
                 continue;
             }
 //            System.out.println(keyword+":"+"agglomerationDegree:"+agglomerationDegree+",combinationDegree:"+combinationDegree);
@@ -74,7 +72,7 @@ public class TextExtractionWord {
         for (String key : filteredKeywordList) {
             List<String> tokens = service.analyzer(key);
             if (tokens.size()!=1){
-                if (tokens.size()==2){
+                if (tokens.size()==2 && key.length()>2){
                     String kk = tokens.get(0)+tokens.get(1);
                     if (!kk.equals(key)){
                         System.out.println(key+":"+tokens);
